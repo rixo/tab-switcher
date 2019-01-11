@@ -6,7 +6,13 @@ TabSwitcher =
   tabLists: new Map
 
   currentList: ->
-    pane = atom.workspace.getActivePane()
+    if atom.config.get 'tab-switcher.alwaysCenter'
+      center = atom.workspace.getCenter()
+      return null if not center
+      pane = center.getActivePane()
+    else
+      pane = atom.workspace.getActivePane()
+
     return null if not pane
 
     if !@tabLists.has(pane)
@@ -58,14 +64,22 @@ TabSwitcher =
 module.exports =
   config:
     fadeInDelay:
+      order: 1
       type: 'number',
       default: 0.1,
       title: 'Pause before displaying tab switcher, in seconds'
       description: 'Increasing this can reduce flicker when switching quickly.'
     reorderTabs:
+      order: 2
       type: 'boolean'
       default: false
       title: 'Reorder tabs to match the list'
+    alwaysCenter:
+      order: 3
+      type: 'boolean'
+      default: false
+      title: "Always switch tabs from center pane (even when center pane isn't
+        focused)"
 
   activate: (state) ->
     @disposable = new CompositeDisposable
